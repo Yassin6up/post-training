@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منشئ جلسات التدريب بالفيديو</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #9b59b6;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #1a2a6c, #1a2a6c);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to left, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(44, 62, 80, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-title i {
+            margin-left: 10px;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 40, 53, 0.7);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(30, 40, 53, 0.9);
+        }
+        
+        .token-input {
+            position: relative;
+        }
+        
+        .token-input i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .video-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(30, 40, 53, 0.4);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .video-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(30, 40, 53, 0.6);
+        }
+        
+        .video-upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .video-item {
+            display: flex;
+            background: rgba(30, 40, 53, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .video-preview {
+            width: 150px;
+            min-height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .video-preview i {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .video-info {
+            flex: 1;
+            padding: 15px;
+        }
+        
+        .video-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .video-name i {
+            margin-left: 8px;
+            color: var(--secondary);
+        }
+        
+        .video-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-left: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .submit-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .submit-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: linear-gradient(to left, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to left, #2980b9, #27ae60);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .status-indicator {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid var(--secondary);
+        }
+        
+        .status-error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--danger);
+        }
+        
+        .note-field {
+            margin-top: 10px;
+        }
+        
+        .instructions {
+            background: rgba(155, 89, 182, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-right: 4px solid var(--accent);
+        }
+        
+        .instructions h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions h3 i {
+            margin-left: 10px;
+        }
+        
+        .instructions ul {
+            padding-right: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions li i {
+            margin-left: 10px;
+            color: var(--accent);
+        }
+        
+        .age-group-select {
+            background: rgba(30, 40, 53, 0.7);
+            color: var(--light);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-item {
+                flex-direction: column;
+            }
+            
+            .video-preview {
+                width: 100%;
+                min-height: 150px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">جاري معالجة طلبك...</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-video"></i> منشئ جلسات التدريب بالفيديو</h1>
+            <p>إنشاء جلسات تدريبية مع فيديوهات وملاحظات لكل فيديو</p>
+        </header>
+
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> تعليمات الاستخدام</h3>
+            <ul>
+                <li><i class="fas fa-key"></i> أدخل رمز الوصول في الحقل المخصص</li>
+                <li><i class="fas fa-info-circle"></i> املأ تفاصيل الجلسة التدريبية</li>
+                <li><i class="fas fa-image"></i> اختر صورة للجلسة التدريبية (اختياري)</li>
+                <li><i class="fas fa-video"></i> أضف الفيديوهات عن طريق السحب والإفلات أو النقر على منطقة الرفع</li>
+                <li><i class="fas fa-sticky-note"></i> اكتب ملاحظات لكل فيديو في الحقل المخصص أسفله</li>
+                <li><i class="fas fa-paper-plane"></i> انقر على "إنشاء الجلسة التدريبية" عند الانتهاء</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-key"></i>
+                <h2>رمز الوصول</h2>
+            </div>
+            <div class="form-group token-input">
+                <label for="token">رمز API</label>
+                <input
+                    type="text"
+                    id="token"
+                    placeholder="أدخل رمز الوصول"
+                    value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwia2luZCI6ImRvY3RvciIsImlhdCI6MTc0OTE1MjUzMiwiZXhwIjoxNzgwNjg4NTMyfQ.8LtUWqtxBkQZHfTkIKGrLn81C9xR-8aMgC9uvnAxFS8">
+                <i class="fas fa-eye" id="toggleToken"></i>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-info-circle"></i>
+                <h2>تفاصيل الجلسة التدريبية</h2>
+            </div>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="title">عنوان الجلسة</label>
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="أدخل عنوان الجلسة"
+                        value="الجلسة الأولى">
+                </div>
+                <div class="form-group">
+                    <label for="level">رقم الجلسة</label>
+                    <input
+                        type="number"
+                        id="level"
+                        placeholder="رقم الجلسة"
+                        min="1"
+                        value="1">
+                </div>
+                <div class="form-group">
+                    <label for="duration">المدة (دقائق)</label>
+                    <input
+                        type="number"
+                        id="duration"
+                        placeholder="أدخل المدة"
+                        min="1"
+                        value="30">
+                </div>
+                <div class="form-group">
+                    <label for="sort">الترتيب</label>
+                    <input
+                        type="number"
+                        id="sort"
+                        placeholder="الترتيب"
+                        min="1"
+                        value="1">
+                </div>
+                <div class="form-group">
+                    <label for="category">التصنيف</label>
+                    <input
+                        type="text"
+                        id="category"
+                        placeholder="أدخل التصنيف"
+                        value="category11">
+                </div>
+                <div class="form-group">
+                    <label for="ageGroup">الفئة العمرية</label>
+                    <select id="ageGroup" class="age-group-select">
+                        <option value="kid">أطفال</option>
+                        <option value="old">كبار السن</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="image">صورة الجلسة التدريبية</label>
+                <input type="file" id="image" accept="image/*">
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-video"></i>
+                <h2>فيديوهات التدريب</h2>
+            </div>
+
+            <div class="video-upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>انقر لرفع الفيديوهات</h3>
+                <p>اسحب وأفلت الملفات أو انقر لتحديد الفيديوهات</p>
+                <input
+                    type="file"
+                    id="videoUpload"
+                    multiple
+                    accept="video/*"
+                    style="display: none">
+            </div>
+
+            <div class="video-list" id="videoList">
+                <!-- Video items will be added here dynamically -->
+            </div>
+        </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> إنشاء الجلسة التدريبية
+            </button>
+
+            <div class="status-indicator" id="statusIndicator">
+                <p id="statusMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const tokenInput = document.getElementById("token");
+        const toggleToken = document.getElementById("toggleToken");
+        const uploadArea = document.getElementById("uploadArea");
+        const videoUpload = document.getElementById("videoUpload");
+        const videoList = document.getElementById("videoList");
+        const submitBtn = document.getElementById("submitBtn");
+        const statusIndicator = document.getElementById("statusIndicator");
+        const statusMessage = document.getElementById("statusMessage");
+        const loadingOverlay = document.getElementById("loadingOverlay");
+
+        // Store videos and their notes
+        const videos = [];
+
+        // Toggle token visibility
+        toggleToken.addEventListener("click", () => {
+            const type = tokenInput.type === "password" ? "text" : "password";
+            tokenInput.type = type;
+            toggleToken.classList.toggle("fa-eye");
+            toggleToken.classList.toggle("fa-eye-slash");
+        });
+
+        // Handle video uploads
+        uploadArea.addEventListener("click", () => {
+            videoUpload.click();
+        });
+        
+        // Add drag and drop functionality
+        uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#3498db';
+            uploadArea.style.background = 'rgba(30, 40, 53, 0.8)';
+        });
+        
+        uploadArea.addEventListener("dragleave", () => {
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            uploadArea.style.background = 'rgba(30, 40, 53, 0.4)';
+        });
+        
+        uploadArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            uploadArea.style.background = 'rgba(30, 40, 53, 0.4)';
+            
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        videoUpload.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+                videoUpload.value = "";
+            }
+        });
+        
+        function handleFiles(files) {
+            Array.from(files).forEach((file) => {
+                if (!file.type.startsWith("video/")) {
+                    showStatus("الرجاء اختيار ملفات فيديو فقط", "error");
+                    return;
+                }
+
+                // Add video to the list
+                addVideo(file);
+            });
+        }
+
+        // Add video to the list
+        function addVideo(file) {
+            const videoId = Date.now() + Math.random().toString(36).substr(2, 5);
+
+            videos.push({
+                id: videoId,
+                file: file,
+                note: "",
+            });
+
+            renderVideoList();
+        }
+
+        // Update video note
+        function updateNote(videoId, note) {
+            const video = videos.find((v) => v.id === videoId);
+            if (video) {
+                video.note = note;
+            }
+        }
+
+        // Remove video from list
+        function removeVideo(videoId) {
+            const index = videos.findIndex((v) => v.id === videoId);
+            if (index !== -1) {
+                videos.splice(index, 1);
+                renderVideoList();
+            }
+        }
+
+        // Render video list
+        function renderVideoList() {
+            videoList.innerHTML = "";
+
+            if (videos.length === 0) {
+                videoList.innerHTML =
+                    '<p class="empty-message">لم يتم إضافة فيديوهات بعد. انقر على منطقة الرفع لإضافة فيديوهات.</p>';
+                return;
+            }
+
+            videos.forEach((video) => {
+                const videoItem = document.createElement("div");
+                videoItem.className = "video-item";
+                videoItem.innerHTML = `
+                    <div class="video-preview">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-name">
+                            <i class="fas fa-file-video"></i>
+                            <span>${video.file.name}</span>
+                        </div>
+                        <div class="video-details">
+                            <div>الحجم: ${formatFileSize(video.file.size)}</div>
+                            <div>النوع: ${video.file.type.split("/")[1] || "video"}</div>
+                        </div>
+                        <div class="form-group note-field">
+                            <label for="note-${video.id}">ملاحظات لهذا الفيديو</label>
+                            <textarea 
+                                id="note-${video.id}" 
+                                placeholder="اكتب ملاحظات خاصة لهذا الفيديو"
+                                oninput="updateNote('${video.id}', this.value)"
+                            >${video.note}</textarea>
+                        </div>
+                        <div class="video-actions">
+                            <button class="btn btn-danger" onclick="removeVideo('${video.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                videoList.appendChild(videoItem);
+            });
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return "0 بايت";
+            const k = 1024;
+            const sizes = ["بايت", "ك.ب", "م.ب", "ج.ب"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // Show status message
+        function showStatus(message, type = "success") {
+            statusMessage.textContent = message;
+            statusIndicator.className = "status-indicator";
+            statusIndicator.classList.add(`status-${type}`);
+            statusIndicator.style.display = "block";
+
+            // Auto-hide success messages
+            if (type === "success") {
+                setTimeout(() => {
+                    statusIndicator.style.display = "none";
+                }, 5000);
+            }
+        }
+
+        // Show loading overlay
+        function showLoading() {
+            loadingOverlay.style.display = "flex";
+            submitBtn.disabled = true;
+        }
+
+        // Hide loading overlay
+        function hideLoading() {
+            loadingOverlay.style.display = "none";
+            submitBtn.disabled = false;
+        }
+
+        // Submit form
+        submitBtn.addEventListener("click", async () => {
+            // Validate inputs
+            const token = tokenInput.value.trim();
+            const title = document.getElementById("title").value.trim();
+            const level = document.getElementById("level").value.trim();
+            const duration = document.getElementById("duration").value.trim();
+            const sort = document.getElementById("sort").value.trim();
+            const category = document.getElementById("category").value.trim();
+            const ageGroup = document.getElementById("ageGroup").value;
+            const imageFile = document.getElementById("image").files[0];
+
+            if (!token) {
+                showStatus("رمز الوصول مطلوب", "error");
+                return;
+            }
+
+            if (!title || !level || !duration || !sort || !category || !ageGroup) {
+                showStatus("الرجاء ملء جميع تفاصيل الجلسة", "error");
+                return;
+            }
+
+            if (videos.length === 0) {
+                showStatus("الرجاء إضافة فيديو واحد على الأقل", "error");
+                return;
+            }
+
+            // Show loading overlay
+            showLoading();
+            
+            try {
+                // Prepare form data
+                const formData = new FormData();
+                formData.append("title", title);
+                formData.append("level", level);
+                formData.append("duration", duration);
+                formData.append("sort", sort);
+                formData.append("category", category);
+                formData.append("ageGroup", ageGroup);
+
+                if (imageFile) {
+                    formData.append("image", imageFile);
+                }
+
+                // Add videos
+                videos.forEach((video) => {
+                    formData.append("videos", video.file);
+                });
+
+                // Send data to API
+                const response = await fetch('https://backend.dentalsnoreclinic.com:3040/api/trainings/create', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || "حدث خطأ أثناء إنشاء الجلسة");
+                }
+
+                // Get training ID from response
+                const trainingId = data.training.id 
+                console.log('training id : ' , trainingId)
+                // Prepare notes data
+                const notesData = {
+                    trainingId: trainingId,
+                    notes: videos.map((video) => video.note),
+                };
+
+                // Send notes to API
+                const notesResponse = await fetch('https://backend.dentalsnoreclinic.com:3040/api/videonotes/create', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(notesData)
+                });
+                
+                const notesResult = await notesResponse.json();
+                
+                if (!notesResponse.ok) {
+                    throw new Error(notesResult.message || "حدث خطأ أثناء إضافة الملاحظات");
+                }
+
+                // Show success message
+                showStatus(
+                    `تم إنشاء الجلسة بنجاح! رقم الجلسة: ${trainingId}. تم إضافة ملاحظات لـ ${videos.length} فيديو.`
+                );
+
+                // Reset form
+                document.getElementById("title").value = "";
+                document.getElementById("level").value = "1";
+                document.getElementById("duration").value = "30";
+                document.getElementById("sort").value = "1";
+                document.getElementById("category").value = "";
+                document.getElementById("image").value = "";
+                document.getElementById("ageGroup").value = "kid";
+                
+                // Clear videos
+                videos.length = 0;
+                renderVideoList();
+                
+            } catch (error) {
+                console.error("Error:", error.response.data);
+                showStatus(`فشل في إنشاء الجلسة: ${error.message}`, "error");
+            } finally {
+                // Hide loading overlay
+                hideLoading();
+            }
+        });
+
+        // Initialize
+        renderVideoList();
+    </script>
+</body>
+</html>
